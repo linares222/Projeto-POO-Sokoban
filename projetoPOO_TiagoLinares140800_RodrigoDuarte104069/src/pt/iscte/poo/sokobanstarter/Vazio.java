@@ -1,14 +1,14 @@
 package pt.iscte.poo.sokobanstarter;
 
-import pt.iscte.poo.gui.ImageTile;
 import pt.iscte.poo.utils.Point2D;
 
-public class Vazio implements ImageTile{
+public class Vazio extends GameElement{
 	
 	Point2D Point2D;
 	
 	public Vazio(Point2D Point2D) {
-		this.Point2D = Point2D;
+		super(Point2D,"Vazio", 1);
+		this.Point2D= Point2D;
 	}
 	
 	@Override

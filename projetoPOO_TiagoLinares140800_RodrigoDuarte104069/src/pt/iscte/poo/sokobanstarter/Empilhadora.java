@@ -1,25 +1,21 @@
 package pt.iscte.poo.sokobanstarter;
 
 import java.awt.event.KeyEvent;
-import java.util.Random;
 
-import pt.iscte.poo.gui.ImageTile;
-import pt.iscte.poo.observer.Observed;
 import pt.iscte.poo.utils.Direction;
 import pt.iscte.poo.utils.Point2D;
-import pt.iscte.poo.utils.Vector2D;
 
-public class Empilhadora implements ImageTile{
+public class Empilhadora extends GameElement{
 
 	private Point2D position;
-	private String imageName;
+	private String imageName="Empilhadora_D";
 	private int energyPoints=100;
 	private int moves=0;
 	private Direction newDirection=Direction.DOWN;
 	
 	public Empilhadora(Point2D initialPosition){
-		position = initialPosition;
-		imageName = "Empilhadora_D";
+		super(initialPosition, "Empilhadora_D", 1);
+		this.position= initialPosition;
 	}
 	
 	public int getEnergyPoints() {
@@ -84,7 +80,6 @@ public void move(int keyCode) {
 			newPosition.getY()>=0 && newPosition.getY()<10 )
 			{
 			position = newPosition;
-			GameEngine.getInstance().getBobcat().setEnergyPoints(getEnergyPoints()-1);
 		}
 	}
 		

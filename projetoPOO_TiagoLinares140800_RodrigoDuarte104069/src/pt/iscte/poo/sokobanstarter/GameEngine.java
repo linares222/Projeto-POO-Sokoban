@@ -11,7 +11,6 @@ import pt.iscte.poo.gui.ImageMatrixGUI;
 import pt.iscte.poo.gui.ImageTile;
 import pt.iscte.poo.observer.Observed;
 import pt.iscte.poo.observer.Observer;
-import pt.iscte.poo.utils.Direction;
 import pt.iscte.poo.utils.Point2D;
 
 // Note que esta classe e' um exemplo - nao pretende ser o inicio do projeto, 
@@ -38,15 +37,16 @@ public class GameEngine implements Observer {
 
 	private static GameEngine INSTANCE; // Referencia para o unico objeto GameEngine (singleton)
 	private ImageMatrixGUI gui;  		// Referencia para ImageMatrixGUI (janela de interface com o utilizador) 
-	private List<ImageTile> tileList;	// Lista de imagens
+// Lista de imagens
 	private Empilhadora bobcat;	        // Referencia para a empilhadora
 	private String playerName;
 	public int level=4;
+	public List<GameElement> lista;
 
 
 	// Construtor - neste exemplo apenas inicializa uma lista de ImageTiles
 	private GameEngine() {
-		tileList = new ArrayList<>();   
+		lista = new ArrayList<GameElement>();   
 	}
 
 	// Implementacao do singleton para o GameEngine
@@ -67,19 +67,13 @@ public class GameEngine implements Observer {
 	private int getLevel() {
 		return level;
 	}
-	private List<ImageTile> getTileList() {
-		return tileList;
-	}
 	
 	// Inicio
 	public void start() {
 
 		// Setup inicial da janela que faz a interface com o utilizador
 		// algumas coisas poderiam ser feitas no main, mas estes passos tem sempre que ser feitos!
-		System.out.println("Insere o teu nome");
-		Scanner keyboard = new Scanner(System.in);
-		this.playerName = keyboard.nextLine();
-		keyboard.close();
+		
 		gui = ImageMatrixGUI.getInstance();    // 1. obter instancia ativa de ImageMatrixGUI	
 		gui.setSize(GRID_HEIGHT, GRID_WIDTH);  // 2. configurar as dimensoes 
 		gui.registerObserver(this);            // 3. registar o objeto ativo GameEngine como observador da GUI
@@ -89,11 +83,11 @@ public class GameEngine implements Observer {
 		// Criar o cenario de jogo
 		createWarehouse();      // criar o armazem
 		createMoreStuff();      // criar mais algun objetos (empilhadora, caixotes,...)
-		sendImagesToGUI();      // enviar as imagens para a GUI
+		
 
 		
 		// Escrever uma mensagem na StatusBar
-		gui.setStatusMessage("Level: "+ getLevel() + " - Player: "+getPlayerName()+" - Moves: "+ getBobcat().getMoves() + " - Energy:"+getBobcat().getEnergyPoints());
+		gui.setStatusMessage("Level: "+ getLevel() + " - Player: "+gui.askUser("username")+" - Moves: "+ getBobcat().getMoves() + " - Energy:"+getBobcat().getEnergyPoints());
 	}
 
 	// O metodo update() e' invocado automaticamente sempre que o utilizador carrega numa tecla
@@ -107,12 +101,13 @@ public class GameEngine implements Observer {
 			bobcat.move(key);
 			}
 		
-		
-			
-	
-
 		gui.update();                  // redesenha a lista de ImageTiles na GUI, 
 		                               // tendo em conta as novas posicoes dos objetos
+	}
+	
+	public void addGameElement(GameElement e) {
+		lista.add(e);
+		gui.addImage(e);
 	}
 
 
@@ -122,7 +117,7 @@ public class GameEngine implements Observer {
 
 		for (int y=0; y<GRID_HEIGHT; y++)
 			for (int x=0; x<GRID_HEIGHT; x++)
-				tileList.add(new Chao(new Point2D(x,y)));		
+				addGameElement(new Chao(new Point2D(x,y)));		
 	}
 
 	// Criacao de mais objetos
@@ -138,27 +133,26 @@ public class GameEngine implements Observer {
 	                    char symbol = line.charAt(w);
 	                    switch (symbol) {
 						case '#' :
-							tileList.add(new Parede(new Point2D(w,h)));	
+							addGameElement(new Parede(new Point2D(w,h)));	
 						break;
 						case '=' : 
-							tileList.add(new Vazio(new Point2D(w,h)));	
+							addGameElement(new Vazio(new Point2D(w,h)));	
 						break;
 						case 'C' : 
-							tileList.add(new Caixote(new Point2D(w,h)));	
+							addGameElement(new Caixote(new Point2D(w,h)));	
 						break;
 						case 'X' : 
-							tileList.add(new Alvo(new Point2D(w,h)));	
+							addGameElement(new Alvo(new Point2D(w,h)));	
 						break;
 						case 'E' : 
 							this.bobcat= new Empilhadora(new Point2D(w,h));
-							tileList.add(new Chao(new Point2D(w,h)));
-							tileList.add(bobcat);	
+							addGameElement(bobcat);
 						break;
 						case 'B' : 
-							tileList.add(new Bateria(new Point2D(w,h)));	
+							addGameElement(new Bateria(new Point2D(w,h)));	
 						break;
 						case 'T' : 
-							tileList.add(new Teleporte(new Point2D(w,h)));	
+							addGameElement(new Teleporte(new Point2D(w,h)));	
 						break;
 	                    }
 	                }
@@ -173,7 +167,5 @@ public class GameEngine implements Observer {
 
 	// Envio das mensagens para a GUI - note que isto so' precisa de ser feito no inicio
 	// Nao e' suposto re-enviar os objetos se a unica coisa que muda sao as posicoes  
-	private void sendImagesToGUI() {
-		gui.addImages(tileList);
-	}
+
 }

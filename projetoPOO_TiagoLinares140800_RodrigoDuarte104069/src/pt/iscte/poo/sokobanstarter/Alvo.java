@@ -1,14 +1,14 @@
 package pt.iscte.poo.sokobanstarter;
 
-import pt.iscte.poo.gui.ImageTile;
 import pt.iscte.poo.utils.Point2D;
 
-public class Alvo implements ImageTile{
+public class Alvo extends GameElement{
 	
 	private Point2D Point2D;
 	
 	public Alvo(Point2D Point2D){
-		this.Point2D = Point2D;
+		super(Point2D, "Alvo", 1);
+		this.Point2D= Point2D;
 	}
 	
 	@Override

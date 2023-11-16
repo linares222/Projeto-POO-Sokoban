@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import pt.iscte.poo.observer.Observed;
+import pt.iscte.poo.sokobanstarter.GameElement;
 import pt.iscte.poo.utils.Point2D;
 
 /**
@@ -236,18 +237,18 @@ public class ImageMatrixGUI extends Observed {
     /**
      * Add a new set of images to the main window.
      *
-     * @param newImages images to be added to main window
+     * @param tileList images to be added to main window
      * @throws IllegalArgumentException if no image with that name (and a suitable extension) is
      *                                  found the images folder
      */
 
-    public void addImages(final List<ImageTile> newImages) {
+    public void addImages(final List<ImageTile> tileList) {
         synchronized (images) { // Added 16-Mar-2016
-            if (newImages == null)
+            if (tileList == null)
                 throw new IllegalArgumentException("Null list");
-            if (newImages.size() == 0)
+            if (tileList.size() == 0)
                 return;
-            for (ImageTile i : newImages) {
+            for (ImageTile i : tileList) {
                 if (i == null)
                     throw new IllegalArgumentException("Null image");
                 if (!imageDB.containsKey(i.getName())) {
