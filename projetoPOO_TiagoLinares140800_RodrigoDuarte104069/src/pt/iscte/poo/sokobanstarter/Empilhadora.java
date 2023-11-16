@@ -84,8 +84,7 @@ public void move(int keyCode) {
 			newPosition.getY()>=0 && newPosition.getY()<10 )
 			{
 			position = newPosition;
-			setMoves(getMoves()+1);
-			setEnergyPoints(getEnergyPoints()-1);
+			GameEngine.getInstance().getBobcat().setEnergyPoints(getEnergyPoints()-1);
 		}
 	}
 		

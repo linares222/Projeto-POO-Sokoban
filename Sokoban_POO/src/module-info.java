@@ -1,8 +1,0 @@
-/**
- * 
- */
-/**
- * 
- */
-module Sokoban_POO {
-}
