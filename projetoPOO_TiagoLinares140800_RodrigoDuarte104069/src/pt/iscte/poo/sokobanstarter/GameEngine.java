@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import pt.iscte.poo.gui.ImageMatrixGUI;
-import pt.iscte.poo.gui.ImageTile;
 import pt.iscte.poo.observer.Observed;
 import pt.iscte.poo.observer.Observer;
 import pt.iscte.poo.utils.Point2D;
@@ -34,10 +33,8 @@ public class GameEngine implements Observer {
 	// Dimensoes da grelha de jogo
 	public static final int GRID_HEIGHT = 10;
 	public static final int GRID_WIDTH = 10;
-
 	private static GameEngine INSTANCE; // Referencia para o unico objeto GameEngine (singleton)
 	private ImageMatrixGUI gui;  		// Referencia para ImageMatrixGUI (janela de interface com o utilizador) 
-// Lista de imagens
 	private Empilhadora bobcat;	        // Referencia para a empilhadora
 	private String playerName;
 	public int level=4;
@@ -111,7 +108,17 @@ public class GameEngine implements Observer {
 	}
 
 
-
+	
+	public boolean checkBounds(Point2D coordinate){ //verifican parede
+		for(GameElement a : lista){
+			if(a.getPosition().equals(coordinate) && (a instanceof Parede)){
+				  return true;
+				}
+			}
+		return false;
+	}
+	
+	
 	// Criacao da planta do armazem - so' chao neste exemplo 
 	private void createWarehouse() {
 
@@ -120,6 +127,10 @@ public class GameEngine implements Observer {
 				addGameElement(new Chao(new Point2D(x,y)));		
 	}
 
+	
+	//FABRICA DE OBJETOS
+	
+	
 	// Criacao de mais objetos
 	private void createMoreStuff() {
 		String nomeFicheiro = "levels/level" + getLevel() + ".txt";

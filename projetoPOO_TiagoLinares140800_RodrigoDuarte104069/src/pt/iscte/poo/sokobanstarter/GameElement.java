@@ -15,6 +15,19 @@ public abstract class GameElement implements ImageTile{
 		this.layer=layer;
 	}
 	
+	//set position
+	public void setName(String nome) {
+		name=nome;
+	}
+	
+	public void setPosition(Point2D Point2D) {
+		position= Point2D;
+	}
+	
+	public void setLayer(int camada) {
+		layer=camada;
+	}
+	
 	@Override
 	public String getName() {
 		return name;
