@@ -11,6 +11,7 @@ import pt.iscte.poo.gui.ImageMatrixGUI;
 import pt.iscte.poo.observer.Observed;
 import pt.iscte.poo.observer.Observer;
 import pt.iscte.poo.utils.Point2D;
+import pt.iscte.poo.utils.Vector2D;
 
 // Note que esta classe e' um exemplo - nao pretende ser o inicio do projeto, 
 // embora tambem possa ser usada para isso.
@@ -37,7 +38,7 @@ public class GameEngine implements Observer {
 	private ImageMatrixGUI gui;  		// Referencia para ImageMatrixGUI (janela de interface com o utilizador) 
 	private Empilhadora bobcat;	        // Referencia para a empilhadora
 	private String playerName;
-	public int level=4;
+	public int level=2;
 	public List<GameElement> lista;
 
 
@@ -64,7 +65,15 @@ public class GameEngine implements Observer {
 	private int getLevel() {
 		return level;
 	}
-	
+	public List<GameElement> getElemsInPos(Point2D p) {
+		List<GameElement> elems= new ArrayList<GameElement>();
+		for(GameElement elem: lista) {
+			if(elem.getPosition().equals(p) && !(elem instanceof Chao)) {
+				elems.add(elem);
+			}
+		}
+		return elems;
+	}
 	// Inicio
 	public void start() {
 
@@ -95,7 +104,7 @@ public class GameEngine implements Observer {
 		int key = gui.keyPressed();    // obtem o codigo da tecla pressionada
 		
 		if (key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN || key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT) {  // se a tecla for UP, manda a empilhadora mover
-			bobcat.move(key);
+			bobcat.handleChangeDirection(key);
 			}
 		
 		gui.update();                  // redesenha a lista de ImageTiles na GUI, 
@@ -109,14 +118,27 @@ public class GameEngine implements Observer {
 
 
 	
-	public boolean checkBounds(Point2D coordinate){ //verifican parede
-		for(GameElement a : lista){
-			if(a.getPosition().equals(coordinate) && (a instanceof Parede)){
+	public boolean checkBounds(Point2D initialPoint, Vector2D v){ //verifican parede //adicionar se for unmovablecaixote
+		Point2D newPos = initialPoint.plus(v);	
+		List<GameElement> elems = getElemsInPos(newPos);
+		for(GameElement elem: elems) {
+		if(elem instanceof Parede){
 				  return true;
 				}
-			}
+		if(elem instanceof Caixote) {
+				if(!checkBounds(newPos, v)) {
+					((Caixote) elem).move(newPos, v); //tirar move daqui e passar para a empilhadora
+					bobcat.setEnergyPoints(bobcat.getEnergyPoints()-1); // fazer isto na empilhadora
+
+					return false;
+				}
+				return true;
+				}
+		}
 		return false;
+		
 	}
+
 	
 	
 	// Criacao da planta do armazem - so' chao neste exemplo 

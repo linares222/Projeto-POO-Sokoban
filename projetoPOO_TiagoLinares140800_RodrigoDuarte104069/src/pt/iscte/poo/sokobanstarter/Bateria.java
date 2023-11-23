@@ -6,7 +6,7 @@ public class Bateria extends GameElement {
 
 
 	public Bateria(Point2D position) {
-		super(position, "Bateria", 1);
+		super(position, "Bateria", 0);
 
 	}
 
