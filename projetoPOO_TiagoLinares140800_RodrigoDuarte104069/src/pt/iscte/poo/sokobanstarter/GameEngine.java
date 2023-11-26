@@ -38,7 +38,7 @@ public class GameEngine implements Observer {
 	private ImageMatrixGUI gui;  		// Referencia para ImageMatrixGUI (janela de interface com o utilizador) 
 	private Empilhadora bobcat;	        // Referencia para a empilhadora
 	private String playerName;
-	public int level=2;
+	public int level=5;
 	public List<GameElement> lista;
 
 
@@ -72,6 +72,7 @@ public class GameEngine implements Observer {
 				elems.add(elem);
 			}
 		}
+		
 		return elems;
 	}
 	// Inicio
@@ -79,12 +80,13 @@ public class GameEngine implements Observer {
 
 		// Setup inicial da janela que faz a interface com o utilizador
 		// algumas coisas poderiam ser feitas no main, mas estes passos tem sempre que ser feitos!
-		
+	
 		gui = ImageMatrixGUI.getInstance();    // 1. obter instancia ativa de ImageMatrixGUI	
 		gui.setSize(GRID_HEIGHT, GRID_WIDTH);  // 2. configurar as dimensoes 
 		gui.registerObserver(this);            // 3. registar o objeto ativo GameEngine como observador da GUI
 		gui.go();                              // 4. lancar a GUI
 
+		
 		
 		// Criar o cenario de jogo
 		createWarehouse();      // criar o armazem
@@ -93,7 +95,8 @@ public class GameEngine implements Observer {
 
 		
 		// Escrever uma mensagem na StatusBar
-		gui.setStatusMessage("Level: "+ getLevel() + " - Player: "+gui.askUser("username")+" - Moves: "+ getBobcat().getMoves() + " - Energy:"+getBobcat().getEnergyPoints());
+		String name = gui.askUser("Username");
+		gui.setStatusMessage("SOKOBAN Starter Package - Name: "+name+"Turns: " + GameEngine.getInstance().getBobcat().getMoves() + " Energy Points: " + GameEngine.getInstance().getBobcat().getEnergyPoints());
 	}
 
 	// O metodo update() e' invocado automaticamente sempre que o utilizador carrega numa tecla
@@ -115,6 +118,11 @@ public class GameEngine implements Observer {
 		lista.add(e);
 		gui.addImage(e);
 	}
+	
+	public void removeGameElement(GameElement e, Point2D p ) {
+		lista.removeIf(elem->(e.getPosition().equals(p))&&(e.equals(elem)));
+		gui.removeImage(e);
+	}
 
 
 	
@@ -122,19 +130,24 @@ public class GameEngine implements Observer {
 		Point2D newPos = initialPoint.plus(v);	
 		List<GameElement> elems = getElemsInPos(newPos);
 		for(GameElement elem: elems) {
-		if(elem instanceof Parede){
+		if(elem instanceof Parede ){
 				  return true;
 				}
-		if(elem instanceof Caixote) {
+		if(elem instanceof Movable) {
 				if(!checkBounds(newPos, v)) {
-					((Caixote) elem).move(newPos, v); //tirar move daqui e passar para a empilhadora
-					bobcat.setEnergyPoints(bobcat.getEnergyPoints()-1); // fazer isto na empilhadora
-
 					return false;
 				}
 				return true;
 				}
+		if(elem instanceof ParedeRachada) {
+			if(bobcat.hasMartelo) {
+				removeGameElement(elem, newPos);
+				return false;
+			}
+			return true;
 		}
+		}
+		
 		return false;
 		
 	}
@@ -152,11 +165,47 @@ public class GameEngine implements Observer {
 	
 	//FABRICA DE OBJETOS
 	
+	public GameElement factory(char symbol, Point2D position) {
+		switch (symbol) {
+		case '#' :
+			return new Parede(position);
+		
+		case '=' : 
+			return new Vazio(position);	
+
+		case 'C' : 
+			return new Caixote(position);
+
+		case 'X' : 
+			return new Alvo(position);	
+
+		case 'E' : 
+			this.bobcat= new Empilhadora(position);
+			return bobcat;
+
+		case 'B' : 
+			return new Bateria(position);	
+
+		case 'T' : 
+			return new Teleporte(position);	
+		case '%' :
+			return new ParedeRachada(position);
+		case 'M' :
+			return new Martelo(position);
+		case 'P':
+			return new Palete(position);
+		case 'O':
+			return new Buraco(position);
+		default:
+			return null;
+		}
+	}
 	
 	// Criacao de mais objetos
 	private void createMoreStuff() {
 		String nomeFicheiro = "levels/level" + getLevel() + ".txt";
 	    File file = new File(nomeFicheiro);
+	    
 	    try {
 	        Scanner s = new Scanner(file);
 	        for (int h = 0; h < GRID_HEIGHT; h++) {
@@ -164,29 +213,9 @@ public class GameEngine implements Observer {
 	                String line = s.nextLine();
 	                for (int w = 0; w < GRID_WIDTH; w++) {
 	                    char symbol = line.charAt(w);
-	                    switch (symbol) {
-						case '#' :
-							addGameElement(new Parede(new Point2D(w,h)));	
-						break;
-						case '=' : 
-							addGameElement(new Vazio(new Point2D(w,h)));	
-						break;
-						case 'C' : 
-							addGameElement(new Caixote(new Point2D(w,h)));	
-						break;
-						case 'X' : 
-							addGameElement(new Alvo(new Point2D(w,h)));	
-						break;
-						case 'E' : 
-							this.bobcat= new Empilhadora(new Point2D(w,h));
-							addGameElement(bobcat);
-						break;
-						case 'B' : 
-							addGameElement(new Bateria(new Point2D(w,h)));	
-						break;
-						case 'T' : 
-							addGameElement(new Teleporte(new Point2D(w,h)));	
-						break;
+	                    GameElement element = factory(symbol, new Point2D(w, h));
+	                    if (element != null) {
+	                        addGameElement(element);
 	                    }
 	                }
 	            }
