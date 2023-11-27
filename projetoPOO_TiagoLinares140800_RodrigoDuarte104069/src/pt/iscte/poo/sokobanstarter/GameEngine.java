@@ -38,7 +38,7 @@ public class GameEngine implements Observer {
 	private ImageMatrixGUI gui;  		// Referencia para ImageMatrixGUI (janela de interface com o utilizador) 
 	private Empilhadora bobcat;	        // Referencia para a empilhadora
 	private String playerName;
-	public int level=5;
+	public int level=0;
 	public List<GameElement> lista;
 
 
@@ -162,8 +162,6 @@ public class GameEngine implements Observer {
 				addGameElement(new Chao(new Point2D(x,y)));		
 	}
 
-	
-	//FABRICA DE OBJETOS
 	
 	public GameElement factory(char symbol, Point2D position) {
 		switch (symbol) {

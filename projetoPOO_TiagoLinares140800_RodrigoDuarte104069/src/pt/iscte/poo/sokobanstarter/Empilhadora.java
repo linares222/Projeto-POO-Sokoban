@@ -87,7 +87,6 @@ public class Empilhadora extends GameElement implements Movable {
 
     	if (newPosition.getX() >= 0 && newPosition.getX() < 10 && newPosition.getY() >= 0 && newPosition.getY() < 10) {
     		List<GameElement> elems = instancia.getElemsInPos(newPosition);
-    		System.out.println(elems.toString());
     		for(GameElement elem: elems) {
     			if(elem instanceof Movable) {
     				((Movable) elem).move(newPosition, v);
