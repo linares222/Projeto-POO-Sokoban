@@ -4,7 +4,7 @@ import pt.iscte.poo.gui.ImageTile;
 import pt.iscte.poo.utils.Point2D;
 
 public abstract class GameElement implements ImageTile{
-
+	protected GameEngine instancia = GameEngine.getInstance();
 	private Point2D position;
 	private String name;
 	private int layer;
@@ -15,6 +15,44 @@ public abstract class GameElement implements ImageTile{
 		this.layer=layer;
 	}
 	
+	public static GameElement factory(char symbol, Point2D position) {
+		switch (symbol) {
+		case '#' :
+			return new Parede(position);
+		
+		case '=' : 
+			return new Vazio(position);	
+
+		case 'C' : 
+			return new Caixote(position);
+
+		case 'X' : 
+			return new Alvo(position);	
+
+		case 'E' : 
+			Empilhadora emp=new Empilhadora(position);
+			GameEngine.getInstance().setBobcat(emp);
+			return emp;
+
+		case 'B' : 
+			return new Bateria(position);	
+
+		case 'T' : 
+			return new Teleporte(position);	
+		case '%' :
+			return new ParedeRachada(position);
+		case 'M' :
+			return new Martelo(position);
+		case 'P':
+			return new Palete(position);
+		case 'O':
+			return new Buraco(position);
+		case 'S':
+			return new SmallStone(position);
+		default:
+			return null;
+		}
+	}
 	//set position
 	public void setName(String nome) {
 		name=nome;

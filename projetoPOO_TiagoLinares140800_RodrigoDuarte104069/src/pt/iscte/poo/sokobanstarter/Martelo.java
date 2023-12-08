@@ -2,8 +2,18 @@ package pt.iscte.poo.sokobanstarter;
 
 import pt.iscte.poo.utils.Point2D;
 
-public class Martelo extends GameElement {
-	public Martelo(Point2D Point2D){
-		super(Point2D, "Martelo", 1);
+public class Martelo extends GameElement implements ExtraElement {
+	public Martelo(Point2D position) {
+		super(position, "Martelo", 0);
+	}
+		
+	@Override
+	public void activate() {
+		if(instancia.getBobcat().getHasMartelo()==false) {
+			instancia.getBobcat().setHasMartelo(true);
+			instancia.removeGameElement(this, getPosition());
+		}
+	
+		
 	}
 }

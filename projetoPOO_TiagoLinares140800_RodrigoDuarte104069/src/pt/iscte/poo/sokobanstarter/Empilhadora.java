@@ -12,10 +12,8 @@ public class Empilhadora extends GameElement implements Movable {
     private String imageName = "Empilhadora_D";
     private int energyPoints = 100;
     private int moves = 0;
-    public boolean hasMartelo = false; 
+    private boolean hasMartelo = false; 
     
-    
-    public GameEngine instancia = GameEngine.getInstance();
     
     public Empilhadora(Point2D initialPosition) {
         super(initialPosition, "Empilhadora_D", 2);
@@ -36,7 +34,6 @@ public class Empilhadora extends GameElement implements Movable {
     public int getMoves() {
         return moves;
     }
-
     public String getImageName() {
         return imageName;
     }
@@ -53,18 +50,20 @@ public class Empilhadora extends GameElement implements Movable {
 	
 	public void handleChangeDirection(int keyCode) {
 		Direction d = Direction.directionFor(keyCode);
-		if (keyCode == KeyEvent.VK_UP) {
-    	    setName("Empilhadora_U");
-    	}
-    	if (keyCode == KeyEvent.VK_DOWN) {
-    	    setName("Empilhadora_D");
-    	}
-    	if (keyCode == KeyEvent.VK_LEFT) {          
-    	    setName("Empilhadora_L");
-    	}
-    	if (keyCode == KeyEvent.VK_RIGHT) {
-    	    setName("Empilhadora_R");
-    	}
+		 switch (keyCode) {
+	        case KeyEvent.VK_UP:
+	            setName("Empilhadora_U");
+	            break;
+	        case KeyEvent.VK_DOWN:
+	            setName("Empilhadora_D");
+	            break;
+	        case KeyEvent.VK_LEFT:
+	            setName("Empilhadora_L");
+	            break;
+	        case KeyEvent.VK_RIGHT:
+	            setName("Empilhadora_R");
+	            break;
+		 }
     	Point2D oldPosition = getPosition();
     	move(oldPosition, d.asVector());
 	}
@@ -83,32 +82,34 @@ public class Empilhadora extends GameElement implements Movable {
     	
     	if (isMovable(position, v)){
     	
+    	Point2D oldPosition = getPosition();
     	Point2D newPosition = getPosition().plus(v);
+    
 
     	if (newPosition.getX() >= 0 && newPosition.getX() < 10 && newPosition.getY() >= 0 && newPosition.getY() < 10) {
     		List<GameElement> elems = instancia.getElemsInPos(newPosition);
+    		setPosition(newPosition);
+    		moves++;
+			energyPoints--;
+		
     		for(GameElement elem: elems) {
-    			if(elem instanceof Movable) {
-    				((Movable) elem).move(newPosition, v);
-    				energyPoints--;
+    			
+    			if(elem instanceof PushableElement) {		
+    				((PushableElement) elem).move(newPosition, v);
     			}
-    			if(elem instanceof Bateria) {
-    				if(energyPoints<51) {
-    					setEnergyPoints(energyPoints+50);
-    				}else {
-    					setEnergyPoints(100);
-    				}
-    				instancia.removeGameElement(elem, newPosition);
+    			if(elem instanceof ExtraElement) {
+    				((ExtraElement) elem).activate();
     			}
-    			if(elem instanceof Martelo) {
-    				setHasMartelo(true);
-    				instancia.removeGameElement(elem, newPosition);
+
+    			if(elem instanceof HoleElement) {
+    				((HoleElement)elem).activate(this,oldPosition, v);
     			}
-    		}
-    			setPosition(newPosition);
-    			System.out.println(energyPoints);
-    			setMoves(moves++);
-    			energyPoints--;
+    		}	
+    		instancia.updateEnergyBar(energyPoints);
+    			if(energyPoints==0) {
+    				instancia.addScore(moves);
+    				instancia.endGame(instancia.getLevel());
+    			}
     			
     	   
     	}
